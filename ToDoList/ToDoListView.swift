@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ToDoListView: View {
+    @State private var sheetIsPresented = false
     var toDos = ["Learn Swift",
                  "Build Apps",
                  "Change the World",
@@ -27,6 +28,20 @@ struct ToDoListView: View {
             .navigationTitle("To Do List")
             .navigationBarTitleDisplayMode(.automatic)
             .listStyle(.plain)
+            .toolbar(content: {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        sheetIsPresented.toggle()   // true -> false/false -> true
+                    }, label: {
+                        Image(systemName: "plus")
+                    })
+                }
+            })
+            // A sheet shows from buttom to top
+            // fullScreenCover acts same as sheet but it covers the whole screen.
+            .sheet(isPresented: $sheetIsPresented, content: {
+                DetailView(passedValue: "")
+            })
         }
     }
 }
