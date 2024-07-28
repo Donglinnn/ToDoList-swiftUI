@@ -17,16 +17,15 @@ class ToDosViewModel: ObservableObject {
     @Published var toDos: [ToDo] = []
     
     init() {
-        // Temp Data here. Will eventually load in saved data.
-        toDos.append(ToDo(item: "Learn Swift"))
-        toDos.append(ToDo(item: "Build Apps"))
-        toDos.append(ToDo(item: "Change the World!"))
+        loadData()
     }
     
-    func saveToDo(toDo: ToDo, newToDo: Bool) {
+    func saveToDo(toDo: ToDo) {
         // if new, append to toDoVM.todos else update the toDo that was passed in from the list.
-        if newToDo {
-            toDos.append(toDo)
+        if toDo.id == nil { // A new toDo, we need to assign an id for it.
+            var newToDo = toDo  // Since toDo is a parameter pass in, it is a "let" constant, when we want to change it's property, we need to change its property to var
+            newToDo.id = UUID().uuidString
+            toDos.append(newToDo)
         } else {
             // Updating toDo whenever we want:
             // firstIndex(where:{}) is to find the index of the first element that suits the statement inside where, i.e, the statement is true.
@@ -36,6 +35,41 @@ class ToDosViewModel: ObservableObject {
             if let index = toDos.firstIndex(where: {$0.id == toDo.id}) {
                 toDos[index] = toDo
             }
+        }
+        saveData()
+    }
+    
+    func deleteToDo(indexSet: IndexSet) {
+        toDos.remove(atOffsets: indexSet)
+        saveData()
+    }
+    
+    func moveToDo(indices: IndexSet, newOffset: Int) {
+        toDos.move(fromOffsets: indices, toOffset: newOffset)
+        saveData()
+    }
+    
+    // To save data into device, using json encoder
+    // Since we are encoding toDos, we need to add Codable protocol to the struct ToDo.
+    // 以後要拿來用只要把component跟.encode裡面的東西改一改就好
+    func saveData() {
+        let path = URL.documentsDirectory.appending(component: "toDos")
+        let data = try? JSONEncoder().encode(toDos) // try? means if error is thrown, data = nil.
+        do {
+            try data?.write(to: path)
+        } catch {
+            print("😡 ERROR: Could not save data \(error.localizedDescription)")
+        }
+    }
+    
+    func loadData() {
+        let path = URL.documentsDirectory.appending(component: "toDos")
+        guard let data = try? Data(contentsOf: path) else {return}
+        do {
+            // We want to decode the data into Array of ToDo struct.
+            toDos = try JSONDecoder().decode(Array<ToDo>.self, from: data)
+        } catch {
+            print("😡 ERROR: Could not load data \(error.localizedDescription)")
         }
     }
 }

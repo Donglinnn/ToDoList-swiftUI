@@ -11,7 +11,6 @@ struct DetailView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var toDosVM: ToDosViewModel
     @State var toDo = ToDo()
-    var newToDo = false
     
     var body: some View {
         List {
@@ -58,7 +57,7 @@ struct DetailView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save") {
-                    toDosVM.saveToDo(toDo: toDo, newToDo: newToDo)
+                    toDosVM.saveToDo(toDo: toDo)
                     dismiss()
                 }
             }
