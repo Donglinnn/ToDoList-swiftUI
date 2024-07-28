@@ -24,6 +24,7 @@ struct ToDoListView: View {
                 }
             }
             .navigationTitle("To Do List")
+            .font(.system(.body, design: .rounded))
             .navigationBarTitleDisplayMode(.automatic)
             .listStyle(.plain)
             .toolbar(content: {

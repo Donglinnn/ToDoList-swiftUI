@@ -16,28 +16,30 @@ struct DetailView: View {
     var body: some View {
         List {
             TextField("Enter To Do Here", text: $toDo.item)
-                .font(.title)
+                .font(.system(.title, design: .rounded))
                 .textFieldStyle(.roundedBorder)
                 .padding(.vertical)
                 .listRowSeparator(.hidden)
             
-            Toggle("Set Reminder", isOn: $toDo.reminderIsOn)
-                .padding(.top)
-                .listRowSeparator(.hidden)
-            
-            DatePicker("Date", selection: $toDo.dueDate)
-                .listRowSeparator(.hidden)
-                .disabled(!toDo.reminderIsOn)
-            
-            Text("Notes: ")
-                .padding(.top)
-            TextField("Notes", text: $toDo.notes, axis: .vertical)   // axis: 隨著文字增加而延伸的方向
-                .textFieldStyle(.roundedBorder)
-                .listRowSeparator(.hidden)
-            
-            Toggle("Completed:", isOn: $toDo.isCompleted)
-                .padding(.top)
-                .listRowSeparator(.hidden)
+            Group {
+                Toggle("Set Reminder", isOn: $toDo.reminderIsOn)
+                    .listRowSeparator(.hidden)
+                
+                
+                DatePicker("Date", selection: $toDo.dueDate)
+                    .listRowSeparator(.hidden)
+                    .disabled(!toDo.reminderIsOn)
+                
+                Text("Notes: ")
+                
+                TextField("Notes", text: $toDo.notes, axis: .vertical)   // axis: 隨著文字增加而延伸的方向
+                    .textFieldStyle(.roundedBorder)
+                    .listRowSeparator(.hidden)
+                
+                Toggle("Completed:", isOn: $toDo.isCompleted)
+                    .listRowSeparator(.hidden)
+            }
+            .font(.system(.body, design: .rounded))
         }
         .listStyle(.plain)
         /*
@@ -52,17 +54,16 @@ struct DetailView: View {
                 Button("Cancel") {
                     dismiss()
                 }
+                
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save") {
-                    // if new, append to toDoVM.todos else update the toDo that was passed in from the list.
-                    if newToDo {
-                        toDosVM.toDos.append(toDo)
-                        dismiss()
-                    }
+                    toDosVM.saveToDo(toDo: toDo, newToDo: newToDo)
+                    dismiss()
                 }
             }
         })
+        .font(.system(.body, design: .rounded))
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -23,6 +23,8 @@ struct ToDoListApp: App {
      Use only once per object.
     */
     @StateObject var toDosVM = ToDosViewModel() // Create an instance of ToDosVM class.
+                                                // 創建完後，只需要在會需要用到這個物件的View的Preview中後面加上.environmentObject modifier將class從環境引入那個View
+                                                // 然後在那個View的開頭將引入的東西用@EnvironmentObject propertyWrapper設成變數做引用
     var body: some Scene {
         WindowGroup {
             ToDoListView()
