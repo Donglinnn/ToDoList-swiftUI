@@ -6,47 +6,43 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ToDoListView: View {
     @State private var sheetIsPresented = false
-    @EnvironmentObject var toDosVM: ToDosViewModel
-    
+    // @Query fetches data from Swiftdata's ModelContainer, so they can be displayed in SwiftUI Views.
+    // @Query variables will also trigger View updates on every change data (similar to how @State weorks).
+    @Query var toDos: [ToDo]
+    @Environment(\.modelContext) var modelContext
     
     var body: some View {
         NavigationStack {
             List {
-                ForEach(toDosVM.toDos) { toDo in
-                    NavigationLink {
-                        DetailView(toDo: toDo)
-                    } label: {
-                        Text(toDo.item)
+                ForEach(toDos) { toDo in
+                    HStack {
+                        Image(systemName: toDo.isCompleted ? "checkmark.rectangle" : "rectangle")
+                            .onTapGesture {
+                                toDo.isCompleted.toggle()
+                            }
+                        NavigationLink {
+                            DetailView(toDo: toDo)
+                        } label: {
+                            Text(toDo.item)
+                        }
+                    }
+                    .font(.system(.title2, design: .rounded))
+                    .swipeActions {
+                        Button("Delete", role: .destructive) {
+                            modelContext.delete(toDo)
+                        }
                     }
                 }
-                // Shorthand calls to .onDelete and .onMove
-                .onDelete(perform: toDosVM.deleteToDo)
-                .onMove(perform: toDosVM.moveToDo)
-                // Traditional calls are below
-                // When we swipe left or perform some other row-deleting action, SwiftUI will pass in the rows selected in the form of indexSet.
-                // we move the perform to a function inside the ViewModel.
-//                .onDelete(perform: { indexSet in
-//                    toDosVM.delete(indexSet: indexSet)
-//                })
-                // When we click the Edit button, the move dragging button shows up at the right side of all toDos, by dragging that, we can change the order of the list.
-                // we move the perform to a function inside the ViewModel.
-//                .onMove(perform: { indices, newOffset in
-//                    toDosVM.toDos.move(fromOffsets: indices, toOffset: newOffset)
-//                })
+
             }
             .navigationTitle("To Do List")
-            .font(.system(.body, design: .rounded))
             .navigationBarTitleDisplayMode(.automatic)
             .listStyle(.plain)
             .toolbar(content: {
-                ToolbarItem(placement: .topBarLeading) {
-                    EditButton()
-                        .font(.system(.body, design: .rounded))
-                }
-                
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
                         sheetIsPresented.toggle()   // true -> false/false -> true
@@ -62,12 +58,12 @@ struct ToDoListView: View {
                     DetailView(toDo: ToDo())    // new value
                 }
             })
+            
         }
     }
 }
 
 #Preview {
     ToDoListView()
-        .environmentObject(ToDosViewModel())
 }
 

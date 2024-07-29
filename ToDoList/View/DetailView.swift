@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DetailView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var toDosVM: ToDosViewModel
     @State var toDo = ToDo()
+    @Environment(\.modelContext) var modelContext
     
     var body: some View {
         List {
@@ -57,7 +58,7 @@ struct DetailView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save") {
-                    toDosVM.saveToDo(toDo: toDo)
+                    modelContext.insert(toDo)
                     dismiss()
                 }
             }
@@ -72,6 +73,6 @@ struct DetailView: View {
 #Preview {
     NavigationStack {
         DetailView(toDo: ToDo())
-            .environmentObject(ToDosViewModel())
+            .modelContainer(for: ToDo.self)
     }
 }
